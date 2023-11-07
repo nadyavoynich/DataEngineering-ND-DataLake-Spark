@@ -41,8 +41,6 @@ STEDI provides [three JSON data sources](https://github.com/udacity/nd027-Data-E
 - `step_trainer` records from the motion sensor
 - `accelerometer` data from the mobile app
 
-Review the data in the respective folders on Github.
-
 ### Project Workflow
 ![Project Workflow](images/project_workflow.png "Project Workflow")
 
@@ -50,15 +48,15 @@ Review the data in the respective folders on Github.
 
 ### Landing Zone
 
-1. Ingested data from the data source repository into a landing zone S3 bucket using AWS CloudShell.
+#### 1. Ingested data from the data source repository into a landing zone S3 bucket using AWS CloudShell.
 
 
-2. Created Glue tables (SQL DDL scripts):
+#### 2. Created Glue tables (SQL DDL scripts):
 * [customer_landing.sql](./customer_landing.sql)
 * [accelerometer_landing.sql](./accelerometer_landing.sql)
 * [step_trainer_landing.sql](./step_trainer_landing.sql)
 
-3. Used Athena to query data in the Landing Zone.
+#### 3. Used Athena to query data in the Landing Zone.
 
 * `customer_landing` table:
 ![customer_landing](images/customer_landing.png)
@@ -76,17 +74,17 @@ The `customer_landing` data contains multiple rows with a blank `shareWithResear
 
 ### Trusted Zone
 
-1. Used Glue Studio to ingest data from an S3 bucket. Glue Jobs created:
+#### 1. Used Glue Studio to ingest data from an S3 bucket. Glue Jobs created:
 * [customer_landing_to_trusted.py](./customer_landing_to_trusted.py) has a node that drops rows that do not have data in the `sharedWithResearchAsOfDate` column.
 * [accelerometer_landing.py](./accelerometer_landing_to_trusted.py) has a node that inner joins the `customer_trusted` data with the `accelerometer_landing` data by emails.
 * [step_trainer_landing.py](./step_trainer_trusted.py) has a node that inner joins the `step_trainer_landing` data with the `customer_curated` data by serial numbers.
 
-2. Created Glue tables:
+#### 2. Created Glue tables:
 * `customer_trusted`
 * `accelerometer_trusted`
 * `step_trainer_trusted`
 
-3. Used Athena to query data in the Trusted Zone
+#### 3. Used Athena to query data in the Trusted Zone
 
 * record count check for each table:
 ![row count check](images/check_trusted_zone.png)
@@ -95,15 +93,15 @@ The `customer_landing` data contains multiple rows with a blank `shareWithResear
 
 ### Curated Zone
 
-1. Used Glue Studio to ingest data from an S3 bucket. Glue Jobs created:
+#### 1. Used Glue Studio to ingest data from an S3 bucket. Glue Jobs created:
 * [customer_trusted_to_curated.py](./customer_trusted_to_curated.py) as a node that inner joins the `customer_trusted` data with the `accelerometer_trusted` data by emails.
 * [machine_learning_curated.py](./machine_learning_curated.py) has a node that inner joins the `step_trainer_trusted` data with the `accelerometer_trusted` data by sensor reading time and timestamps.
 
-2. Created Glue tables:
+#### 2. Created Glue tables:
 * `customer_curated`
 * `machine_learning_curated`
 
-3. Used Athena to query data in the Trusted Zone
+#### 3. Used Athena to query data in the Curated Zone
 
 * record count check for each table:
 ![row count check](images/check_curated_zone.png)
