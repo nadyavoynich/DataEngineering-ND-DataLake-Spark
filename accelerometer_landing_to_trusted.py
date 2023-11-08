@@ -64,17 +64,17 @@ DropFields_node1699024055129 = DropFields.apply(
 )
 
 # Script generated for node Accelrometer Trusted Zone
-AccelrometerTrustedZone_node1698829985944 = (
-    glueContext.write_dynamic_frame.from_options(
-        frame=DropFields_node1699024055129,
-        connection_type="s3",
-        format="json",
-        connection_options={
-            "path": "s3://whiterose-lake-house/accelerometer/trusted/",
-            "partitionKeys": [],
-        },
-        transformation_ctx="AccelrometerTrustedZone_node1698829985944",
-    )
+AccelrometerTrustedZone_node1698829985944 = glueContext.getSink(
+    path="s3://whiterose-lake-house/accelerometer/trusted/",
+    connection_type="s3",
+    updateBehavior="LOG",
+    partitionKeys=[],
+    enableUpdateCatalog=True,
+    transformation_ctx="AccelrometerTrustedZone_node1698829985944",
 )
-
+AccelrometerTrustedZone_node1698829985944.setCatalogInfo(
+    catalogDatabase="whiterose", catalogTableName="accelerometer_trusted"
+)
+AccelrometerTrustedZone_node1698829985944.setFormat("json")
+AccelrometerTrustedZone_node1698829985944.writeFrame(DropFields_node1699024055129)
 job.commit()

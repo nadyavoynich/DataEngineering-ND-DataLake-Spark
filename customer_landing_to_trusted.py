@@ -34,27 +34,29 @@ LandingCustomerZone_node1698089543781 = glueContext.create_dynamic_frame.from_op
 )
 
 # Script generated for node SQL Query
-SqlQuery1355 = """
+SqlQuery1809 = """
 select * from myDataSource
 where sharewithresearchasofdate is not null;
 """
 SQLQuery_node1699004829590 = sparkSqlQuery(
     glueContext,
-    query=SqlQuery1355,
+    query=SqlQuery1809,
     mapping={"myDataSource": LandingCustomerZone_node1698089543781},
     transformation_ctx="SQLQuery_node1699004829590",
 )
 
 # Script generated for node Trusted Customer Zone
-TrustedCustomerZone_node1698089945465 = glueContext.write_dynamic_frame.from_options(
-    frame=SQLQuery_node1699004829590,
+TrustedCustomerZone_node1698089945465 = glueContext.getSink(
+    path="s3://whiterose-lake-house/customer/trusted/",
     connection_type="s3",
-    format="json",
-    connection_options={
-        "path": "s3://whiterose-lake-house/customer/trusted/",
-        "partitionKeys": [],
-    },
+    updateBehavior="LOG",
+    partitionKeys=[],
+    enableUpdateCatalog=True,
     transformation_ctx="TrustedCustomerZone_node1698089945465",
 )
-
+TrustedCustomerZone_node1698089945465.setCatalogInfo(
+    catalogDatabase="whiterose", catalogTableName="customer_trusted"
+)
+TrustedCustomerZone_node1698089945465.setFormat("json")
+TrustedCustomerZone_node1698089945465.writeFrame(SQLQuery_node1699004829590)
 job.commit()

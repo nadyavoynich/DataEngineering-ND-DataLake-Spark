@@ -36,14 +36,14 @@ StepTrainerLanding_node1699261190248 = glueContext.create_dynamic_frame.from_cat
 )
 
 # Script generated for node Join
-SqlQuery1312 = """
+SqlQuery1732 = """
 select step_trainer_landing.sensorreadingtime, step_trainer_landing.serialnumber, step_trainer_landing.distancefromobject
 from step_trainer_landing, customer_curated
 where step_trainer_landing.serialnumber = customer_curated.serialnumber
 """
 Join_node1699265823094 = sparkSqlQuery(
     glueContext,
-    query=SqlQuery1312,
+    query=SqlQuery1732,
     mapping={
         "customer_curated": CustomerCurated_node1699260933571,
         "step_trainer_landing": StepTrainerLanding_node1699261190248,
@@ -52,28 +52,29 @@ Join_node1699265823094 = sparkSqlQuery(
 )
 
 # Script generated for node Select Distinct
-SqlQuery1313 = """
+SqlQuery1733 = """
 select distinct * from myDataSource
 
 """
 SelectDistinct_node1699269260355 = sparkSqlQuery(
     glueContext,
-    query=SqlQuery1313,
+    query=SqlQuery1733,
     mapping={"myDataSource": Join_node1699265823094},
     transformation_ctx="SelectDistinct_node1699269260355",
 )
 
 # Script generated for node Step Trainer Trusted
-StepTrainerTrusted_node1699269351676 = glueContext.write_dynamic_frame.from_options(
-    frame=SelectDistinct_node1699269260355,
+StepTrainerTrusted_node1699269351676 = glueContext.getSink(
+    path="s3://whiterose-lake-house/step_trainer/trusted/",
     connection_type="s3",
-    format="json",
-    connection_options={
-        "path": "s3://whiterose-lake-house/step_trainer/trusted/",
-        "compression": "snappy",
-        "partitionKeys": [],
-    },
+    updateBehavior="LOG",
+    partitionKeys=[],
+    enableUpdateCatalog=True,
     transformation_ctx="StepTrainerTrusted_node1699269351676",
 )
-
+StepTrainerTrusted_node1699269351676.setCatalogInfo(
+    catalogDatabase="whiterose", catalogTableName="step_trainer_trusted"
+)
+StepTrainerTrusted_node1699269351676.setFormat("json")
+StepTrainerTrusted_node1699269351676.writeFrame(SelectDistinct_node1699269260355)
 job.commit()
